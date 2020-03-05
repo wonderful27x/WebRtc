@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/roomNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="123456"
+        android:textColor="@color/colorAccent" />
+
+    <Button
+        android:id="@+id/addRoom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="加入房间"/>
+
+    <Button
+        android:id="@+id/p2pVideo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="一对一视频聊天"/>
+
+    <Button
+        android:id="@+id/p2pAudio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="一对一语音聊天"/>
+
+    <Button
+        android:id="@+id/live"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="直播"/>
+
+</LinearLayout>
