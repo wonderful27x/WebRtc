@@ -1,4 +1,4 @@
-package com.example.wywebrtc.View;
+package com.example.wywebrtc.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,10 +13,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.example.wywebrtc.R;
 import com.example.wywebrtc.bean.Message;
-import com.example.wywebrtc.webrtcinderface.MediaType;
+import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
-import com.example.wywebrtc.webrtcsource.WebRtcConfig;
 import com.example.wywebrtc.webrtcsource.WebRtcManager;
 import org.webrtc.MediaStream;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        permissionCheck(MediaType.DEFAULT);
+        permissionCheck(RoomType.DEFAULT);
     }
 
     private void init(){
@@ -51,12 +50,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         live.setOnClickListener(this);
     }
 
-    private void permissionCheck(@MediaType int mediaType){
+    private void permissionCheck(RoomType roomType){
         List<String> permissions = permissionCheck();
         if (!permissions.isEmpty()){
-            permissionRequest(permissions,mediaType);
-        }else if (mediaType != MediaType.DEFAULT){
-            sendRequest(mediaType);
+            permissionRequest(permissions,roomType.getCode());
+        }else if (roomType != RoomType.DEFAULT){
+            sendRequest(roomType.getCode());
         }
     }
 
@@ -82,8 +81,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onRequestPermissionsResult(@MediaType int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == MediaType.DEFAULT){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == RoomType.DEFAULT.getCode()){
             if (grantResults.length >0){
                 for (int result:grantResults){
                     if (result != PackageManager.PERMISSION_GRANTED){
@@ -118,16 +117,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.addRoom:
-                permissionCheck(MediaType.MEET_ROOM);
+                permissionCheck(RoomType.NORMAL);
                 break;
             case R.id.p2pVideo:
-                permissionCheck(MediaType.SINGLE_VIDEO);
+                permissionCheck(RoomType.VIDEO_ONLY);
                 break;
             case R.id.p2pAudio:
-                permissionCheck(MediaType.SINGLE_AUDIO);
+                permissionCheck(RoomType.AUDIO_ONLY);
                 break;
             case R.id.live:
-                permissionCheck(MediaType.LIVE);
+                permissionCheck(RoomType.LIVE);
                 break;
             default:
                 break;
@@ -155,31 +154,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //给房间号加入前缀，代表不同的通话类型
-    private String addPrefix(@MediaType int type,String roomId){
-        String room = null;
-        switch (type){
-            case MediaType.MEET_ROOM:
-                room = WebRtcConfig.MEET_ROOM + "-" + roomId;
-                break;
-            case MediaType.SINGLE_VIDEO:
-                room = WebRtcConfig.SINGLE_VIDEO + "-" + roomId;
-                break;
-            case MediaType.SINGLE_AUDIO:
-                room = WebRtcConfig.SINGLE_AUDIO + "-" + roomId;
-                break;
-            case MediaType.LIVE:
-                room = WebRtcConfig.LIVE + "-" + roomId;
-                break;
-            default:
-                break;
-        }
-        return room;
-    }
     //发起请求
-    private void sendRequest(@MediaType int type){
+    private void sendRequest(int roomTypeCode){
         WebRtcInterface webRtcInterface = WebRtcManager.getInstance(this,null);
-        String roomId = addPrefix(type,roomNumber.getText().toString());
-        webRtcInterface.chatRequest(type,roomId);
+        webRtcInterface.chatRequest(RoomType.getRooType(roomTypeCode),roomNumber.getText().toString());
     }
 }

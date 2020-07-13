@@ -25,10 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".View.SingleAudioActivity" />
-        <activity android:name=".View.SingleVideoActivity" />
-        <activity android:name=".View.MeetRoomActivity" />
-        <activity android:name=".View.MainActivity">
+        <activity android:name=".view.SingleAudioActivity" />
+        <activity android:name=".view.SingleVideoActivity" />
+        <activity android:name=".view.MeetRoomActivity" />
+        <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

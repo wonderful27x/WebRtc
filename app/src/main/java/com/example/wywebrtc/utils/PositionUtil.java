@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-public class PositionUtils {
+public class PositionUtil {
 
     private static int screenWith = 0;//屏幕宽
 

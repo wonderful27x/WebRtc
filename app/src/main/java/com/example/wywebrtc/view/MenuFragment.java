@@ -1,4 +1,4 @@
-package com.example.wywebrtc.View;
+package com.example.wywebrtc.view;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.example.wywebrtc.R;
-import com.example.wywebrtc.utils.Utils;
+import com.example.wywebrtc.utils.DisplayUtil;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
 
 public class MenuFragment extends Fragment implements View.OnClickListener{
@@ -98,13 +98,13 @@ public class MenuFragment extends Fragment implements View.OnClickListener{
         if (isMicEnable) {
             Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.webrtc_mute_default);
             if (drawable != null) {
-                drawable.setBounds(0, 0, Utils.dip2px(activity, 60), Utils.dip2px(activity, 60));
+                drawable.setBounds(0, 0, DisplayUtil.dip2px(activity, 60), DisplayUtil.dip2px(activity, 60));
             }
             switchMute.setCompoundDrawables(null, drawable, null, null);
         } else {
             Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.webrtc_mute);
             if (drawable != null) {
-                drawable.setBounds(0, 0, Utils.dip2px(activity, 60), Utils.dip2px(activity, 60));
+                drawable.setBounds(0, 0, DisplayUtil.dip2px(activity, 60), DisplayUtil.dip2px(activity, 60));
             }
             switchMute.setCompoundDrawables(null, drawable, null, null);
         }
@@ -114,13 +114,13 @@ public class MenuFragment extends Fragment implements View.OnClickListener{
         if (enableSpeaker) {
             Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.webrtc_hands_free);
             if (drawable != null) {
-                drawable.setBounds(0, 0, Utils.dip2px(activity, 60), Utils.dip2px(activity, 60));
+                drawable.setBounds(0, 0, DisplayUtil.dip2px(activity, 60), DisplayUtil.dip2px(activity, 60));
             }
             switchHandsfree.setCompoundDrawables(null, drawable, null, null);
         } else {
             Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.webrtc_hands_free_default);
             if (drawable != null) {
-                drawable.setBounds(0, 0, Utils.dip2px(activity, 60), Utils.dip2px(activity, 60));
+                drawable.setBounds(0, 0, DisplayUtil.dip2px(activity, 60), DisplayUtil.dip2px(activity, 60));
             }
             switchHandsfree.setCompoundDrawables(null, drawable, null, null);
         }
@@ -130,7 +130,7 @@ public class MenuFragment extends Fragment implements View.OnClickListener{
         if (enableCamera) {
             Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.webrtc_open_camera_normal);
             if (drawable != null) {
-                drawable.setBounds(0, 0, Utils.dip2px(activity, 60), Utils.dip2px(activity, 60));
+                drawable.setBounds(0, 0, DisplayUtil.dip2px(activity, 60), DisplayUtil.dip2px(activity, 60));
             }
             powerCamera.setCompoundDrawables(null, drawable, null, null);
             powerCamera.setText(R.string.webrtc_close_camera);
@@ -138,7 +138,7 @@ public class MenuFragment extends Fragment implements View.OnClickListener{
         } else {
             Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.webrtc_open_camera_press);
             if (drawable != null) {
-                drawable.setBounds(0, 0, Utils.dip2px(activity, 60), Utils.dip2px(activity, 60));
+                drawable.setBounds(0, 0, DisplayUtil.dip2px(activity, 60), DisplayUtil.dip2px(activity, 60));
             }
             powerCamera.setCompoundDrawables(null, drawable, null, null);
             powerCamera.setText(R.string.webrtc_open_camera);

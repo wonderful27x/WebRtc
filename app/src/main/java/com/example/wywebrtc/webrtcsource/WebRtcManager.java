@@ -1,13 +1,14 @@
 package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
-import com.example.wywebrtc.View.MeetRoomActivity;
-import com.example.wywebrtc.View.SingleAudioActivity;
-import com.example.wywebrtc.View.SingleVideoActivity;
+
+import com.example.wywebrtc.type.MessageType;
+import com.example.wywebrtc.type.RoomType;
+import com.example.wywebrtc.view.MeetRoomActivity;
+import com.example.wywebrtc.view.SingleAudioActivity;
+import com.example.wywebrtc.view.SingleVideoActivity;
 import com.example.wywebrtc.bean.Message;
 import com.example.wywebrtc.webrtcinderface.ConnectionInterface;
-import com.example.wywebrtc.webrtcinderface.MediaType;
-import com.example.wywebrtc.webrtcinderface.MessageType;
 import com.example.wywebrtc.webrtcinderface.SocketInterface;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
@@ -30,7 +31,7 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     private Context context;                          //上下文
     private EglBase eglBase;                          //EglBase可以获取openGL上下文，利用这个上下文可以直接进行渲染
     private String roomId;                            //房间号
-    private @MediaType int mediaType;                 //聊天的类型
+    private RoomType roomType;                        //房间类型
 
     private WebRtcManager(ViewCallback viewCallback,EglBase eglBase){
         init(viewCallback,eglBase);
@@ -78,7 +79,7 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     private void connect(){
         if (socketInterface == null){
             socketInterface = new WebSocket();
-            connectionInterface = PeerConnectionManager.getInstance(mediaType);
+            connectionInterface = PeerConnectionManager.getInstance(roomType);
         }
         socketInterface.connect(WebRtcConfig.SOCKET_URI);
     }
@@ -136,8 +137,8 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
 
     //发起聊天请求
     @Override
-    public void chatRequest(@MediaType int mediaType, String roomId) {
-        this.mediaType = mediaType;
+    public void chatRequest(RoomType roomType, String roomId) {
+        this.roomType = roomType;
         this.roomId = roomId;
         connect();
     }
@@ -242,20 +243,22 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     @Override
     public void socketCallback(Message message) {
         switch (message.getMessageType()){
-            case MessageType.SOCKET_OPEN:
+            case CONNECT_OK:
                 connectSuccess();
                 break;
-            case MessageType.SOCKET_CLOSE:
+            case SOCKET_OPEN:
+                break;
+            case SOCKET_CLOSE:
                 if (viewCallback != null){
                     viewCallback.socketCallback(message);
                 }
                 break;
-            case MessageType.SOCKET_ERROR:
+            case SOCKET_ERROR:
                 if (viewCallback != null){
                     viewCallback.socketCallback(message);
                 }
                 break;
-            case MessageType.ROOM_FULL:
+            case ROOM_FULL:
                 if (viewCallback != null){
                     viewCallback.socketCallback(message);
                 }

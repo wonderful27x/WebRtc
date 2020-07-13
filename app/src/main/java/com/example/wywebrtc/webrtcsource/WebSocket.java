@@ -5,8 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.example.wywebrtc.bean.Event;
 import com.example.wywebrtc.bean.Message;
-import com.example.wywebrtc.webrtcinderface.MessageType;
+import com.example.wywebrtc.type.MessageType;
 import com.example.wywebrtc.webrtcinderface.SocketInterface;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -248,68 +249,140 @@ public class WebSocket implements SocketInterface {
             //连接成功
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-                Message message = new Message();
-                message.setMessageType(MessageType.SOCKET_OPEN);
-                manager.socketCallback(message);
+                handleMessage(MessageType.SOCKET_OPEN,null);
                 Log.d(TAG,"onOpen");
             }
             //消息推送
             @Override
             public void onMessage(String message) {
-                handleMessage(message);
+                Message messageObject = new Message(message);
+                Event event = new Event();
+                event.objA = event;
+                event.objB = message;
+                handleMessage(messageObject.getMessageType(),event);
                 Log.d(TAG,message);
             }
             //关闭
             @Override
             public void onClose(int code, String reason, boolean remote) {
-                Message message = new Message();
-                message.setMessageType(MessageType.SOCKET_CLOSE);
-                message.setMessage(reason);
-                manager.socketCallback(message);
+                Event event = new Event();
+                event.code = code;
+                event.message = reason;
+                handleMessage(MessageType.SOCKET_CLOSE,event);
                 Log.d(TAG,"onClose");
             }
             //连接失败
             @Override
             public void onError(Exception ex) {
-                Message message = new Message();
-                message.setMessageType(MessageType.SOCKET_ERROR);
-                message.setMessage(ex.getMessage());
-                manager.socketCallback(message);
+                Event event = new Event();
+                event.message = ex.getMessage();
+                handleMessage(MessageType.SOCKET_ERROR,event);
                 Log.e(TAG,ex.getMessage());
             }
         };
+        //TODO 使用加密连接
         if (socketUri.startsWith("wss")){
-            try {
-                SSLContext context = SSLContext.getInstance("TLS");
-                TrustManager[] trustManager = new TrustManager[]{new TrustManagerTest()};
-                context.init(null,trustManager,new SecureRandom());
-                SSLSocketFactory factory = context.getSocketFactory();
-                if (factory != null){
-                    webSocketClient.setSocket(factory.createSocket());//创建一个具有加密证书的socket
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            throw new RuntimeException("暂不支持安全的webSocket连接！");
         }
         webSocketClient.connect();//建立连接
     }
 
-    //实现一个接口什么都不做，相当于忽略整数
-    class TrustManagerTest implements X509TrustManager{
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-
+    //消息分发
+    private void handleMessage(MessageType messageType, Event event){
+        switch (messageType){
+            case SOCKET_OPEN:
+                socketOpen();
+                break;
+            case SOCKET_CLOSE:
+                socketClose(event);
+                break;
+            case SOCKET_ERROR:
+                socketError(event);
+                break;
+            case CONNECT_OK:
+                socketConnectOk(event);
+                break;
+            case COME:
+                comingSelf(event);
+                break;
+            case JOIN:
+                someoneJoin(event);
+                break;
+            case LEAVE:
+                someoneLeave(event);
+                break;
+            case OFFER:
+                someoneSendOffer(event);
+                break;
+            case ANSWER:
+                someoneAnswerOffer(event);
+                break;
+            case CANDIDATE:
+                candidateSwitch(event);
+                break;
         }
+    }
 
-        @Override
-        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+    //socket打开，也就是连接成功了，将信息回掉出去
+    private void socketOpen(){
+        Message message = new Message();
+        message.setMessageType(MessageType.SOCKET_OPEN);
+        manager.socketCallback(message);
+    }
 
-        }
+    //socket关闭，也就是断开连接了，将信息回掉出去
+    private void socketClose(Event event){
+        Message message = new Message();
+        message.setMessageType(MessageType.SOCKET_CLOSE);
+        message.setMessage(event.message);
+        manager.socketCallback(message);
+    }
 
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-        }
+    //socket发生错误
+    private void socketError(Event event){
+        Message message = new Message();
+        message.setMessageType(MessageType.SOCKET_ERROR);
+        message.setMessage(event.message);
+        manager.socketCallback(message);
+    }
+
+    //socket 连接成功，注意他和SOCKET_OPEN是有区别的，SOCKET_OPEN仅仅是代表连接成功而已，这是webSocket的回调api，不携带信息
+    //而CONNECT_OK是服务器通过发送消息告诉客户端连接成功了，是携带了信息的，从这里开始才真正的进入信令交换
+    private void socketConnectOk(Event event){
+        Message message = (Message) event.objA;
+        manager.socketCallback(message);
+    }
+
+    //自己加入房间后得到的服务器响应，服务器会返回房间信息
+    private void comingSelf(Event event){
+
+    }
+
+    //有人加入了房间
+    private void someoneJoin(Event event){
+
+    }
+
+    //有人离开房间
+    private void someoneLeave(Event event){
+
+    }
+
+    //有人发起了媒体协商,即收到了别人主动给自己发送的媒体协商数据
+    private void someoneSendOffer(Event event){
+
+    }
+
+    //有人响应了媒体协商，即自己主动给别人发送媒体协商数据后得到了对方的响应
+    private void someoneAnswerOffer(Event event){
+
+    }
+
+    //网络协商交换，即收别人的网络协商数据
+    //和Offer不同的是candidate不需要Answer,双方把自己重ice服务器获取的网络数据发送给对方就行了
+    //他们之间的数据发送是异步的，即不需要等到A收到B的数据才给B响应，并且网络协商数据会交换多次
+    //而媒体协商数据Offer交换一次就够了
+    private void candidateSwitch(Event event){
+
     }
 }

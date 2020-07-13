@@ -1,4 +1,4 @@
-package com.example.wywebrtc.View;
+package com.example.wywebrtc.view;
 
 import org.webrtc.Logging;
 import org.webrtc.VideoFrame;

@@ -1,13 +1,10 @@
 package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.media.AudioRecord;
-import com.example.wywebrtc.webrtcinderface.ConnectionInterface;
-import com.example.wywebrtc.webrtcinderface.MediaType;
-import com.example.wywebrtc.webrtcinderface.MessageType;
 
+import com.example.wywebrtc.type.RoomType;
+import com.example.wywebrtc.webrtcinderface.ConnectionInterface;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
@@ -123,7 +120,7 @@ import java.util.concurrent.Executors;
 public class PeerConnectionManager implements ConnectionInterface{
     private static PeerConnectionManager perConnectionManager = null;
     private WebRtcManager manager;                       //中转类
-    private @MediaType int mediaType;                    //聊天的类型
+    private RoomType roomType;                           //房间类型
     private String selfId;                               //自己的ID
     private ArrayList<String> socketIds;                 //房间内其他人的id
     private Map<String,Peer> peerConnectionMap;          //会议室所有的P2P连接
@@ -151,13 +148,13 @@ public class PeerConnectionManager implements ConnectionInterface{
     private static final String VIDEO_TRACK_ID = "ARDAMS-VIDEO";                 //视频轨ID
     private static final String SURFACE_THREAD_NAME = "surfaceCaptureThread";    //线程名
 
-    private PeerConnectionManager(@MediaType int mediaType){
-        init(mediaType);
+    private PeerConnectionManager(RoomType roomType){
+        init(roomType);
     }
 
-    private void init(@MediaType int mediaType){
+    private void init(RoomType roomType){
         this.manager = WebRtcManager.getInstance();
-        this.mediaType = mediaType;
+        this.roomType = roomType;
         socketIds = new ArrayList<>();
         executorService = Executors.newSingleThreadExecutor();
         peerConnectionMap = new HashMap<>();
@@ -179,16 +176,16 @@ public class PeerConnectionManager implements ConnectionInterface{
         iceServers.add(turn);
     }
 
-    public static PeerConnectionManager getInstance(@MediaType int mediaType){
+    public static PeerConnectionManager getInstance(RoomType roomType){
         if (perConnectionManager == null){
             synchronized (PeerConnectionManager.class){
                 if (perConnectionManager == null){
-                    perConnectionManager = new PeerConnectionManager(mediaType);
+                    perConnectionManager = new PeerConnectionManager(roomType);
                 }
             }
         }else {
             synchronized (PeerConnectionManager.class){
-                perConnectionManager.init(mediaType);
+                perConnectionManager.init(roomType);
             }
         }
         return perConnectionManager;

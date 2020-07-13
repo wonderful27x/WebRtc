@@ -1,7 +1,6 @@
 package com.example.wywebrtc.webrtcinderface;
 
 import org.webrtc.IceCandidate;
-
 import java.util.ArrayList;
 
 /**

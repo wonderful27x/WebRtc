@@ -1,4 +1,4 @@
-package com.example.wywebrtc.View;
+package com.example.wywebrtc.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;

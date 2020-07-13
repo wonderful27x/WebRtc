@@ -1,4 +1,4 @@
-package com.example.wywebrtc.View;
+package com.example.wywebrtc.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -10,7 +10,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.example.wywebrtc.R;
 import com.example.wywebrtc.bean.Message;
-import com.example.wywebrtc.utils.PositionUtils;
+import com.example.wywebrtc.utils.PositionUtil;
 import com.example.wywebrtc.webrtcinderface.MessageType;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
@@ -212,10 +212,10 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
             SurfaceViewRenderer renderer = videoViews.get(id);
             if (renderer != null){
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                layoutParams.width = PositionUtils.getWith(this,size);
-                layoutParams.height = PositionUtils.getWith(this,size);
-                layoutParams.leftMargin = PositionUtils.getX(this,size,i);
-                layoutParams.topMargin = PositionUtils.getY(this,size,i);
+                layoutParams.width = PositionUtil.getWith(this,size);
+                layoutParams.height = PositionUtil.getWith(this,size);
+                layoutParams.leftMargin = PositionUtil.getX(this,size,i);
+                layoutParams.topMargin = PositionUtil.getY(this,size,i);
                 renderer.setLayoutParams(layoutParams);
             }
         }
