@@ -10,8 +10,8 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.example.wywebrtc.R;
 import com.example.wywebrtc.bean.Message;
+import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.utils.PositionUtil;
-import com.example.wywebrtc.webrtcinderface.MessageType;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
 import com.example.wywebrtc.webrtcsource.WebRtcManager;
@@ -74,7 +74,7 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
     }
 
     @Override
-    public void chatRequest(int mediaType, String roomId) {
+    public void chatRequest(RoomType roomType, String roomId) {
 
     }
 
@@ -90,13 +90,13 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
     @Override
     public void socketCallback(Message message) {
         switch (message.getMessageType()){
-            case MessageType.SOCKET_OPEN:
+            case SOCKET_OPEN:
                 break;
-            case MessageType.SOCKET_CLOSE:
+            case SOCKET_CLOSE:
                 break;
-            case MessageType.SOCKET_ERROR:
+            case SOCKET_ERROR:
                 break;
-            case MessageType.ROOM_FULL:
+            case ROOM_FULL:
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

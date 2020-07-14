@@ -1,7 +1,12 @@
 package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
+import android.os.Handler;
+import android.widget.Toast;
 
+import com.example.wywebrtc.bean.BaseMessage;
+import com.example.wywebrtc.bean.NegotiationMessage;
+import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.type.MessageType;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.view.MeetRoomActivity;
@@ -85,15 +90,18 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     }
 
     //socket建立成功
-    public void connectSuccess() {
-        switch (mediaType) {
-            case MediaType.MEET_ROOM:
+    public void connectSuccess(Message message) {
+
+        connectionInterface.connectSuccess(message);
+
+        switch (roomType) {
+            case NORMAL:
                 MeetRoomActivity.startSelf(context);
                 break;
-            case MediaType.SINGLE_VIDEO:
+            case VIDEO_ONLY:
                 SingleVideoActivity.startSelf(context);
                 break;
-            case MediaType.SINGLE_AUDIO:
+            case AUDIO_ONLY:
                 SingleAudioActivity.startSelf(context);
                 break;
             default:
@@ -146,7 +154,11 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     //socket连接建立后申请加入房间
     @Override
     public void joinRoom() {
-        socketInterface.joinRoom(roomId);
+        NegotiationMessage message = new NegotiationMessage();
+        message.userId = ((PeerConnectionManager)connectionInterface).getSelfId();
+        message.roomId = roomId;
+        message.roomType = ((PeerConnectionManager)connectionInterface).getRoomType();
+        socketInterface.joinRoom(message);
     }
 
     /**==================================WebRtcInterface===========================*/
@@ -184,15 +196,8 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
 
     //创建P2P连接
     @Override
-    public void createConnection(ArrayList<String> connections, String socketId) {
-        if(mediaType == MediaType.SINGLE_AUDIO || mediaType == MediaType.SINGLE_VIDEO){
-            if (connections.size()>1){
-                Message message = new Message(MessageType.ROOM_FULL,"房间已满加入失败！");
-                viewCallback.socketCallback(message);
-                return;
-            }
-        }
-        connectionInterface.createConnection(connections,socketId);
+    public void createConnection(Message message) {
+        connectionInterface.createConnection(message);
     }
 
     //获取链接数
@@ -233,7 +238,7 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     }
 
     @Override
-    public void joinRoom(String roomId) {
+    public void joinRoom(NegotiationMessage message) {
 
     }
     /**====================================SocketInterface============================*/
@@ -244,9 +249,12 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     public void socketCallback(Message message) {
         switch (message.getMessageType()){
             case CONNECT_OK:
-                connectSuccess();
+                connectSuccess(message);
                 break;
             case SOCKET_OPEN:
+                if (viewCallback != null){
+                    viewCallback.socketCallback(message);
+                }
                 break;
             case SOCKET_CLOSE:
                 if (viewCallback != null){
@@ -285,4 +293,14 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
         }
     }
     /**====================================ViewCallback============================*/
+
+    //Toast
+    public void showMessage(String message){
+        new Handler(context.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.example.wywebrtc.bean.BaseMessage;
 import com.example.wywebrtc.bean.Event;
 import com.example.wywebrtc.bean.Message;
+import com.example.wywebrtc.bean.NegotiationMessage;
 import com.example.wywebrtc.type.MessageType;
 import com.example.wywebrtc.webrtcinderface.SocketInterface;
 import org.java_websocket.client.WebSocketClient;
@@ -154,15 +156,10 @@ public class WebSocket implements SocketInterface {
     /**============================通过webSocket发送消息========================*/
     //发起加入房间请求
     @Override
-    public void joinRoom(String roomId){
-        HashMap<String,Object> map = new HashMap<>();
-        HashMap<String,String> child = new HashMap<>();
-        child.put("room",roomId);     //房间号
-        map.put("eventName","__join");//事件类型为加入房间
-        map.put("data",child);
-        JSONObject jsonObject = new JSONObject(map);
-        String message = jsonObject.toString();
-        webSocketClient.send(message);
+    public void joinRoom(NegotiationMessage negotiationMessage){
+        BaseMessage<NegotiationMessage,Object> baseMessage = new BaseMessage<NegotiationMessage, Object>() {};
+        baseMessage.setMessage(negotiationMessage);
+        webSocketClient.send(baseMessage.toJson());
     }
 
     //向房间的其他成员发送自己的SDP信息
@@ -320,6 +317,9 @@ public class WebSocket implements SocketInterface {
             case CANDIDATE:
                 candidateSwitch(event);
                 break;
+            case ROOM_FULL:
+                roomFull(event);
+                break;
         }
     }
 
@@ -353,9 +353,10 @@ public class WebSocket implements SocketInterface {
         manager.socketCallback(message);
     }
 
-    //自己加入房间后得到的服务器响应，服务器会返回房间信息
+    //自己加入房间后得到的服务器响应，服务器会返回房间信息,根据房间成员id分别建立Connection
     private void comingSelf(Event event){
-
+        Message message = (Message) event.objA;
+        manager.createConnection(message);
     }
 
     //有人加入了房间
@@ -384,5 +385,11 @@ public class WebSocket implements SocketInterface {
     //而媒体协商数据Offer交换一次就够了
     private void candidateSwitch(Event event){
 
+    }
+
+    //房间已满
+    private void roomFull(Event event){
+        Message message = (Message) event.objA;
+        manager.socketCallback(message);
     }
 }

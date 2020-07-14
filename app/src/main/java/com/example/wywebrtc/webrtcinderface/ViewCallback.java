@@ -1,6 +1,6 @@
 package com.example.wywebrtc.webrtcinderface;
 
-import com.example.wywebrtc.bean.BaseMessage;
+import com.example.wywebrtc.bean.Message;
 import org.webrtc.MediaStream;
 
 /**
@@ -10,7 +10,7 @@ import org.webrtc.MediaStream;
  * PeerConnection、WebSocket与UI层不存在耦合
  */
 public interface ViewCallback {
-    public void socketCallback(BaseMessage<?,?> message);              //socket状态回调
+    public void socketCallback(Message message);                      //socket状态回调
     public void setLocalStream(MediaStream localStream,String selfId); //添加本地流进行预览
     public void addRemoteStream(MediaStream remoteStream,String socketId);//添加远端的流进行显示
     public void closeWindow(String socketId);                          //关闭窗口

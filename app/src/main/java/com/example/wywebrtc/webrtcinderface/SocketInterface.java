@@ -1,5 +1,6 @@
 package com.example.wywebrtc.webrtcinderface;
 
+import com.example.wywebrtc.bean.NegotiationMessage;
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 
@@ -12,5 +13,5 @@ public interface SocketInterface {
     public void sendAnswer(String socketId, SessionDescription localDescription);//发送应答
     public void sendIceCandidate(String socketId, IceCandidate iceCandidate);    //向房间的其他成员发送自己的iceCandidate信息
     public void close();                                                         //关闭socket
-    public void joinRoom(String roomId);                                         //请求加入房间
+    public void joinRoom(NegotiationMessage message);                            //请求加入房间
 }

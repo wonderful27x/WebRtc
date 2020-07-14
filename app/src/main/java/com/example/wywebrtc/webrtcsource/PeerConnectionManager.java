@@ -2,7 +2,12 @@ package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.widget.Toast;
 
+import com.example.wywebrtc.bean.BaseMessage;
+import com.example.wywebrtc.bean.Message;
+import com.example.wywebrtc.bean.Room;
+import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.webrtcinderface.ConnectionInterface;
 import org.webrtc.AudioSource;
@@ -116,6 +121,11 @@ import java.util.concurrent.Executors;
 
 /**
  * P2P通信中最重要的连接管理类，他将与WebSocket共同完成连接的建立
+ *
+ * TODO 在这个项目中使用了星状型架构，socket、view、和PeerConnection都必须通过WebRtcManager这个唯一的纽带连接
+ * TODO 所有的交互都必须通过他来转发，完全解藕socket、view和PeerConnection，完全面向接口编程，
+ * TODO 然而事实证明这是我写过的最垃圾的架构！！！但是这个项目本身的价值在于对webRtc工作流程的理解，和架构没有任何关系，
+ * TODO 不过是本人失败的艺术品罢了，但是里面关于webRtc的注解是相当详细的，堪称经典，在后续我们将重构代码
  */
 public class PeerConnectionManager implements ConnectionInterface{
     private static PeerConnectionManager perConnectionManager = null;
@@ -199,6 +209,16 @@ public class PeerConnectionManager implements ConnectionInterface{
     }
 
     /**==================================ConnectionInterface===========================*/
+    //webSocket连接成功,获取自己的id信息
+    @Override
+    public void connectSuccess(Message message) {
+        BaseMessage<User,Object> baseMessage = message.transForm(new BaseMessage<User, Object>() {});
+        this.selfId = baseMessage.getMessage().getUserId();
+        if (selfId == null || selfId.length() == 0){
+            manager.showMessage("服务器返回了错误的userId！");
+        }
+    }
+
     //远端有人加入房间
     @Override
     public void remoteJoinToRoom(String socketId) {
@@ -265,9 +285,13 @@ public class PeerConnectionManager implements ConnectionInterface{
 
     //开始初始化数据并创建P2P连接
     @Override
-    public void createConnection(ArrayList<String> connections, String socketId) {
-        socketIds.addAll(connections);
-        this.selfId = socketId;
+    public void createConnection(Message message) {
+        //取出房间里的成员id，
+        BaseMessage<Room,Object> baseMessage = message.transForm(new BaseMessage<Room, Object>() {});
+        List<String> userIds = baseMessage.getMessage().getMembers();
+        //去除自己的id并保存
+        userIds.remove(selfId);
+        socketIds.addAll(userIds);
         //开启一个线程来建立PeerConnection，由于建立过程复杂耗时，所以需要开线程
         executorService.execute(new Runnable() {
             @Override
@@ -704,5 +728,13 @@ public class PeerConnectionManager implements ConnectionInterface{
         public void onSetFailure(String s) {
 
         }
+    }
+
+    public String getSelfId(){
+        return selfId;
+    }
+
+    public RoomType getRoomType(){
+        return roomType;
     }
 }
