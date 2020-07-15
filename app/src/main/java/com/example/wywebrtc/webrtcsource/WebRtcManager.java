@@ -89,7 +89,8 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
             socketInterface = new WebSocket();
             connectionInterface = PeerConnectionManager.getInstance(roomType);
         }
-        socketInterface.connect(WebRtcConfig.SOCKET_URI);
+        String uri = WebRtcConfig.SOCKET_URI + "/" + WebRtcConfig.USER_ID + "/" + WebRtcConfig.DEVICE;
+        socketInterface.connect(uri);
     }
 
     /**==================================WebRtcInterface===========================*/
