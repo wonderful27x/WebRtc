@@ -247,33 +247,7 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     /**====================================ViewCallback============================*/
     @Override
     public void socketCallback(Message message) {
-        switch (message.getMessageType()){
-            case CONNECT_OK:
-                connectSuccess(message);
-                break;
-            case SOCKET_OPEN:
-                if (viewCallback != null){
-                    viewCallback.socketCallback(message);
-                }
-                break;
-            case SOCKET_CLOSE:
-                if (viewCallback != null){
-                    viewCallback.socketCallback(message);
-                }
-                break;
-            case SOCKET_ERROR:
-                if (viewCallback != null){
-                    viewCallback.socketCallback(message);
-                }
-                break;
-            case ROOM_FULL:
-                if (viewCallback != null){
-                    viewCallback.socketCallback(message);
-                }
-                break;
-            default:
-                break;
-        }
+        viewCallback.socketCallback(message);
     }
 
     @Override

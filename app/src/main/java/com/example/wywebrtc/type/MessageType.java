@@ -6,7 +6,7 @@ package com.example.wywebrtc.type;
 public enum  MessageType {
 
     SOCKET_OPEN(0,"SOCKET_OPEN"),       //webSocket打开
-    SOCKET_MESSAGE(1,"SOCKET_MESSAGE"), //webSocket错误
+    SOCKET_MESSAGE(1,"SOCKET_MESSAGE"), //webSocket发送消息
     SOCKET_CLOSE(2,"SOCKET_CLOSE"),     //webSocket关闭
     SOCKET_ERROR(3,"SOCKET_ERROR"),     //webSocket错误
 
