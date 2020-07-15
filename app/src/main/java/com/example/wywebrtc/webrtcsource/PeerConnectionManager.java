@@ -37,21 +37,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description webRtc工作流程详解
  * WebRTC应用可以使用ICE框架来克服实际应用中复杂的网络问题。
  * 要使用ICE的话，你的应用必须如下所述的在RTCPeerConnection中传递ICE服务器的URL。
- *
  * ICE试图找到连接端点的最佳路径。它并行的查找所有可能性，然后选择最有效率的一项。
  * ICE首先用从设备操作系统和网卡上获取的主机地址来尝试连接，如果失败了(比如设备处于NAT之后)，
  * ICE会使用从STUN 服务器获取到的外部地址，如果仍然失败，则交由TURN中继服务器来连接。
- *
  * 换句话说:
  * STUN服务器用于获取设备的外部网络地址
  * TURN服务器是在点对点失败后用于通信中继。
- *
  * 每一个TURN服务器都支持STUN，因为TURN就是在STUN服务器中内建了一个中继功能。
- */
-
-/**
+ *
  * 本来想写一篇博客的，但是因为懒就把我的一些理解和收获写进注释里面，请结合代码理解
  * 在P2P通信中遇到了很多困难，通过网上的资料和实际测试得出一些结论，并将连接建立的过程描述如下：
  * 首先我们要介绍两个很重要的概念，ICE服务器和信令服务器
@@ -70,11 +69,9 @@ import java.util.concurrent.Executors;
  *  在测试中分别打印了SDP和candidate，发现SDP中确实是与媒体相关的信息，并没有包含具体的ip地址
  *  然而即便是官方对SDP和candidate的描述也容易让人产生误解，实际上SDP作为一种会话描述，是信息交换双方约定的统一格式，
  *  无论是媒体协商还是网络协商他们都将信息封装成了SDP会话描述，然后再进行传输
- *
  * 将连接的建立分两种情况：
  * 情况一：房间有人，自己加入房间，我们把这种情况叫做situation A,简称SA
  * 情况二：自己已在房间，有新人加入房间，我们把这种情况叫做situation B,简称SB
- *
  * 下面我们将这两种情况分开来讨论，但是请注意，他们是有很密切的联系的，因为SA的另一端就是SB，所以在理解的时候应当统一起来
  * SA：
  * （1）向服务器发起加入房间的请求，peers被响应并返回房间内所有人的ID
@@ -95,7 +92,6 @@ import java.util.concurrent.Executors;
  *  和SDP不同的是，candidate的交换，即（7）（8）（9）会被重复多次直到完整的candidate交换完成，这取决于到ICE服务器的路径
  *  课上说的是onIceCandidate的调用次数等于路由节点数
  *  当上述过程都完成后P2P通信连接就建立成功了，就可以进行音视频会话了
- *
  *  SB：
  * （1）一个新人加入房间，webSocket端_new_peer被响应并返回新人ID，根据ID创建PeerConnection封装类Peer
  * （2）接着webSocket端_offer被响应
@@ -108,19 +104,17 @@ import java.util.concurrent.Executors;
  * （6）调用addIceCandidate将对方candidate设置到PeerConnection
  * （7）onIceCandidate被调用，得到了自己到ICE服务器的一段路径，并通过webSocket将自己的candidate发送给对等方
  *  和上面相似，（5）（6）（7）重复多次直到完整的candidate交换完成，当上述过程都完成后P2P通信连接就建立成功了，就可以进行音视频会话了
- *
  *  有趣的发现：
  *  如果通信双方在同一个网络内，他们可以直接通信，测试发现即使将stun和turn的地址故意写错他们仍然能够正常通信，
  *  猜测这时并没有走stun和turn
- */
-
-/**
- * P2P通信中最重要的连接管理类，他将与WebSocket共同完成连接的建立
  *
+ * P2P通信中最重要的连接管理类，他将与WebSocket共同完成连接的建立
  * TODO 在这个项目中使用了星状型架构，socket、view、和PeerConnection都必须通过WebRtcManager这个唯一的纽带连接
  * TODO 所有的交互都必须通过他来转发，完全解藕socket、view和PeerConnection，完全面向接口编程，
  * TODO 然而事实证明这是我写过的最垃圾的架构！！！但是这个项目本身的价值在于对webRtc工作流程的理解，和架构没有任何关系，
  * TODO 不过是本人失败的艺术品罢了，但是里面关于webRtc的注解是相当详细的，堪称经典，在后续我们将重构代码
+ *
+ * @license  BSD-2-Clause License
  */
 public class PeerConnectionManager implements ConnectionInterface{
     private static PeerConnectionManager perConnectionManager = null;
@@ -165,13 +159,13 @@ public class PeerConnectionManager implements ConnectionInterface{
         peerConnectionMap = new HashMap<>();
         iceServers = new ArrayList<>();
 
-        //创建stun服务器信息
+        //创建stun服务器信息-打洞
         PeerConnection.IceServer stun = PeerConnection.IceServer.
                 builder(WebRtcConfig.STUN_URI)
                 .setUsername(WebRtcConfig.STUN_USER_NAME)
                 .setPassword(WebRtcConfig.STUN_PASSWORD)
                 .createIceServer();
-        //创建turn服务器信息
+        //创建turn服务器信息-转发
         PeerConnection.IceServer turn = PeerConnection.IceServer.
                 builder(WebRtcConfig.TURN_URI)
                 .setUsername(WebRtcConfig.TURN_USER_NAME)

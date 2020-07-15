@@ -4,10 +4,14 @@ import com.example.wywebrtc.bean.Message;
 import org.webrtc.MediaStream;
 
 /**
- * UI层的回调接口，P2P通信过程中对UI层的控制，如界面刷新等,
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description UI层的回调接口，P2P通信过程中对UI层的控制，如界面刷新等,
  * WebRtcManager会持有这个接口实现者Activity的引用,
  * 整个P2P通信过程中对UI的操作都由WebRtcManager中转完成，
  * PeerConnection、WebSocket与UI层不存在耦合
+ * @license  BSD-2-Clause License
  */
 public interface ViewCallback {
     public void socketCallback(Message message);                      //socket状态回调

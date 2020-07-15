@@ -161,7 +161,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //发起请求
+    //发起请求，必须指定房间号和房间类型，如果房间不存在服务器会主动创建一个房间
+    //注意这个方法仅仅是与服务器建立连接而已，成功后再做后续的操作，这里传递房间号和房间类型是为了保存信息
     private void sendRequest(int roomTypeCode){
         WebRtcInterface webRtcInterface = WebRtcManager.getInstance(this,null);
         webRtcInterface.chatRequest(RoomType.getRooType(roomTypeCode),roomNumber.getText().toString());

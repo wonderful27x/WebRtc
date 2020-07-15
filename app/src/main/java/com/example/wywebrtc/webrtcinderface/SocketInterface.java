@@ -5,7 +5,11 @@ import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 
 /**
- * socket层的接口，在交换信令中与服务器的直接对话
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description socket层的接口，在交换信令中与服务器的直接对话
+ * @license  BSD-2-Clause License
  */
 public interface SocketInterface {
     public void connect(String uri);//发起加入房间请求,成功后服务器返回应答onMessage被调用，带有房间里的人的id和自己的id

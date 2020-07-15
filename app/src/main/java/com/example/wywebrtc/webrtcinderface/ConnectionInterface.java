@@ -5,7 +5,11 @@ import org.webrtc.IceCandidate;
 import java.util.List;
 
 /**
- * PeerConnection层的接口，处理信令信息以及人员进出房间的动作
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description PeerConnection层的接口，处理信令信息以及人员进出房间的动作
+ * @license  BSD-2-Clause License
  */
 public interface ConnectionInterface extends WebRtcInterface{
     public void connectSuccess(User user);                                       //webSocket连接成功

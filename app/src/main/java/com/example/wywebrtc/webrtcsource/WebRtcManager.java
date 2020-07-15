@@ -3,12 +3,8 @@ package com.example.wywebrtc.webrtcsource;
 import android.content.Context;
 import android.os.Handler;
 import android.widget.Toast;
-
-import com.example.wywebrtc.bean.BaseMessage;
 import com.example.wywebrtc.bean.NegotiationMessage;
-import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.bean.User;
-import com.example.wywebrtc.type.MessageType;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.view.MeetRoomActivity;
 import com.example.wywebrtc.view.SingleAudioActivity;
@@ -22,20 +18,25 @@ import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.SessionDescription;
-import java.util.ArrayList;
 import java.util.List;
 
+
 /**
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description webRtc中转站
  * P2P通信中PeerConnectionManager、WebSocket和UI交互的中间纽带，做大量的信息交换，实现各层之间的解耦
  * PeerConnectionManager在建立连接的时候需要通过WebSocket进行信令交换，这项工作将由WebRtcManager转发，
  * 而WebSocket端响应后需要通知PeerConnectionManager，这项工作也由WebRtcManager转发
+ * @license  BSD-2-Clause License
  */
 public class WebRtcManager implements WebRtcInterface,ConnectionInterface,SocketInterface,ViewCallback{
     private static WebRtcManager webRtcManager = null;
     private SocketInterface socketInterface;          //Socket层接口
     private ConnectionInterface connectionInterface;  //Connection层接口
     private ViewCallback viewCallback;                //view层回掉接口
-    private Context context;                          //上下文
+    private Context context;                          //上下文，TODO 内存泄漏警告，但是请注意挂断时释放了context，并不是说单列模式一定会造成内存泄漏，感觉没毛病！！！
     private EglBase eglBase;                          //EglBase可以获取openGL上下文，利用这个上下文可以直接进行渲染
     private String roomId;                            //房间号
     private RoomType roomType;                        //房间类型
@@ -146,12 +147,14 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     /**==================================WebRtcInterface===========================*/
 
     /**====================================ConnectionInterface============================*/
-    //socket建立成功
+    //socket建立成功，启动activity并发起加入房间申请
     @Override
     public void connectSuccess(User user) {
 
+        //将服务器返回的数据保存起来，其中最重要的就是userId
         connectionInterface.connectSuccess(user);
 
+        //根据不同的房间类型启动不同的Activity
         switch (roomType) {
             case NORMAL:
                 MeetRoomActivity.startSelf(context);

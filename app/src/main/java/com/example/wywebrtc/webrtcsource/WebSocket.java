@@ -18,8 +18,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 /**
- * P2P通信中，信令交换的驱动者，直接与信令服务器打交道，包括信令的收取和发送，
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description P2P通信中，信令交换的驱动者，直接与信令服务器打交道，包括信令的收取和发送，
  * 同时还可以用于信令外的信息交换，如发起聊天请求，聊天文字的收发等
+ * @license  BSD-2-Clause License
  */
 public class WebSocket implements SocketInterface {
 
@@ -30,6 +34,67 @@ public class WebSocket implements SocketInterface {
 
     public WebSocket(){
         this.manager = WebRtcManager.getInstance();
+    }
+
+    //请求服务器建立socket连接
+    @Override
+    public void connect(String socketUri) {
+        URI uri = null;
+        try {
+            uri = new URI(socketUri);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        webSocketClient = new WebSocketClient(uri) {
+            //连接成功
+            @Override
+            public void onOpen(ServerHandshake handshakedata) {
+                handleMessage(MessageType.SOCKET_OPEN,null);
+                Log.d(TAG,"onOpen");
+            }
+            //消息推送
+            @Override
+            public void onMessage(String message) {
+                Message messageObject = new Message(message);
+                Event event = new Event();
+                event.objA = event;
+                event.objB = message;
+                handleMessage(messageObject.getMessageType(),event);
+                Log.d(TAG,message);
+            }
+            //关闭
+            @Override
+            public void onClose(int code, String reason, boolean remote) {
+                Event event = new Event();
+                event.code = code;
+                event.message = reason;
+                handleMessage(MessageType.SOCKET_CLOSE,event);
+                Log.d(TAG,"onClose");
+            }
+            //连接失败
+            @Override
+            public void onError(Exception ex) {
+                Event event = new Event();
+                event.message = ex.getMessage();
+                handleMessage(MessageType.SOCKET_ERROR,event);
+                Log.e(TAG,ex.getMessage());
+            }
+        };
+        //TODO 使用加密连接
+        if (socketUri.startsWith("wss")){
+            throw new RuntimeException("暂不支持安全的webSocket连接！");
+        }
+        webSocketClient.connect();//建立连接
+    }
+
+    //关闭webSocket连接，这个关闭动作会被服务器监听到，
+    //服务器会给处理关闭者的其他人发送消息，告诉大家有人离开了房间
+    @Override
+    public void close() {
+        if (webSocketClient != null){
+            webSocketClient.close();
+            webSocketClient = null;
+        }
     }
 
     //消息分发
@@ -204,65 +269,4 @@ public class WebSocket implements SocketInterface {
         webSocketClient.send(jsonData);
     }
     /**============================通过webSocket发送消息========================*/
-
-    //调用webSocketClient.close()后onClose方法会被回调
-    //而远端的onMessage方法被回调，并且类型是_remove_peer
-    //测试中发现，p2p没有建立的时候调用webSocketClient.close()远端无任何回调响应
-    @Override
-    public void close() {
-        if (webSocketClient != null){
-            webSocketClient.close();
-            webSocketClient = null;
-        }
-    }
-    //请求服务器建立socket连接
-    @Override
-    public void connect(String socketUri) {
-        URI uri = null;
-        try {
-            uri = new URI(socketUri);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        webSocketClient = new WebSocketClient(uri) {
-            //连接成功
-            @Override
-            public void onOpen(ServerHandshake handshakedata) {
-                handleMessage(MessageType.SOCKET_OPEN,null);
-                Log.d(TAG,"onOpen");
-            }
-            //消息推送
-            @Override
-            public void onMessage(String message) {
-                Message messageObject = new Message(message);
-                Event event = new Event();
-                event.objA = event;
-                event.objB = message;
-                handleMessage(messageObject.getMessageType(),event);
-                Log.d(TAG,message);
-            }
-            //关闭
-            @Override
-            public void onClose(int code, String reason, boolean remote) {
-                Event event = new Event();
-                event.code = code;
-                event.message = reason;
-                handleMessage(MessageType.SOCKET_CLOSE,event);
-                Log.d(TAG,"onClose");
-            }
-            //连接失败
-            @Override
-            public void onError(Exception ex) {
-                Event event = new Event();
-                event.message = ex.getMessage();
-                handleMessage(MessageType.SOCKET_ERROR,event);
-                Log.e(TAG,ex.getMessage());
-            }
-        };
-        //TODO 使用加密连接
-        if (socketUri.startsWith("wss")){
-            throw new RuntimeException("暂不支持安全的webSocket连接！");
-        }
-        webSocketClient.connect();//建立连接
-    }
 }
