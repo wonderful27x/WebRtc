@@ -24,9 +24,9 @@ public class WebRtcConfig {
     public static final String TURN_USER_NAME = "wonderful";
     public static final String TURN_PASSWORD = "wonderful@123";
     //socket配置
-    public static final String USER_ID = "0";                                          //userId设置为"0",默认小于6位长度由服务器自动产生
-    public static final int DEVICE = DeviceType.PHONE.getCode();                       //设备类型为手机
-    public static final String SOCKET_URI = "ws://114.55.252.175:8080/webRtcSignaling";//webSocket地址
+    public static final String USER_ID = "0";                    //userId设置为"0",默认小于6位长度由服务器自动产生
+    public static final int DEVICE = DeviceType.PHONE.getCode(); //设备类型为手机
+    public static final String SOCKET_URI = "ws://114.55.252.175:8080/webRtcSignalingService/webRtcSignaling";//webSocket地址
     //摄像头配置
     public static final int CAPTURE_WIDTH = 320;  //宽
     public static final int CAPTURE_HEIGHT = 240; //高
