@@ -1,6 +1,5 @@
 package com.example.wywebrtc.bean;
 
-
 import com.example.wywebrtc.type.DeviceType;
 
 /**
@@ -10,7 +9,7 @@ import com.example.wywebrtc.type.DeviceType;
  * @description 用户实体
  * @license BSD-2-Clause License
  */
-public class User {
+public class User{
 
     private String userId;         //用户id
     private String userName;       //用户名
