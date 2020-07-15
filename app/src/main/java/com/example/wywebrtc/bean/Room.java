@@ -6,7 +6,11 @@ import java.util.List;
 
 
 /**
- * 房间实体
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 房间实体
+ * @license BSD-2-Clause License
  */
 public class Room {
 

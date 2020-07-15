@@ -2,11 +2,6 @@ package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.widget.Toast;
-
-import com.example.wywebrtc.bean.BaseMessage;
-import com.example.wywebrtc.bean.Message;
-import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.webrtcinderface.ConnectionInterface;
@@ -211,9 +206,8 @@ public class PeerConnectionManager implements ConnectionInterface{
     /**==================================ConnectionInterface===========================*/
     //webSocket连接成功,获取自己的id信息
     @Override
-    public void connectSuccess(Message message) {
-        BaseMessage<User,Object> baseMessage = message.transForm(new BaseMessage<User, Object>() {});
-        this.selfId = baseMessage.getMessage().getUserId();
+    public void connectSuccess(User user) {
+        this.selfId = user.getUserId();
         if (selfId == null || selfId.length() == 0){
             manager.showMessage("服务器返回了错误的userId！");
         }
@@ -221,27 +215,27 @@ public class PeerConnectionManager implements ConnectionInterface{
 
     //远端有人加入房间
     @Override
-    public void remoteJoinToRoom(String socketId) {
+    public void remoteJoinToRoom(User user) {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 if (localStream == null){
                     createLocalStream();
                 }
-                Peer peer = new Peer(socketId);
+                Peer peer = new Peer(user.getUserId());
                 peer.peerConnection.addStream(localStream);
-                socketIds.add(socketId);
-                peerConnectionMap.put(socketId,peer);
+                socketIds.add(user.getUserId());
+                peerConnectionMap.put(user.getUserId(),peer);
             }
         });
     }
     //有人离开房间
     @Override
-    public void remoteOutRoom(String socketId) {
+    public void remoteOutRoom(User user) {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                closePeerConnection(socketId);
+                closePeerConnection(user.getUserId());
             }
         });
     }
@@ -285,13 +279,10 @@ public class PeerConnectionManager implements ConnectionInterface{
 
     //开始初始化数据并创建P2P连接
     @Override
-    public void createConnection(Message message) {
-        //取出房间里的成员id，
-        BaseMessage<Room,Object> baseMessage = message.transForm(new BaseMessage<Room, Object>() {});
-        List<String> userIds = baseMessage.getMessage().getMembers();
+    public void createConnection(List<String> membersId) {
         //去除自己的id并保存
-        userIds.remove(selfId);
-        socketIds.addAll(userIds);
+        membersId.remove(selfId);
+        socketIds.addAll(membersId);
         //开启一个线程来建立PeerConnection，由于建立过程复杂耗时，所以需要开线程
         executorService.execute(new Runnable() {
             @Override
@@ -402,7 +393,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     }
 
     @Override
-    public void chatRequest(int mediaType, String roomId) {
+    public void chatRequest(RoomType roomType, String roomId) {
 
     }
 
@@ -421,7 +412,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     private PeerConnectionFactory createPeerConnectionFactory(){
         VideoEncoderFactory videoEncoderFactory = null;
         VideoDecoderFactory videoDecoderFactory = null;
-        if (mediaType != MediaType.SINGLE_AUDIO){
+        if (roomType != RoomType.AUDIO_ONLY){
             //创建视频编码器工厂并开启v8和h264编码，webrtc会自动选择最优的，当然也可以只开启其中一个
             videoEncoderFactory = new DefaultVideoEncoderFactory(manager.getEglBase().getEglBaseContext(),true,true);
             //创建视频解密器工厂
@@ -450,7 +441,7 @@ public class PeerConnectionManager implements ConnectionInterface{
         localStream.addTrack(audioTrack);                                                   //将音轨设置到localStream里
 
         //视频
-        if (mediaType == MediaType.SINGLE_AUDIO)return;
+        if (roomType == RoomType.AUDIO_ONLY)return;
         videoCapturer = createVideoCapturer();                                              //创建videoCapturer
         videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());//创建视频源
 
@@ -493,7 +484,7 @@ public class PeerConnectionManager implements ConnectionInterface{
             role = Role.caller;
             Peer peer = entry.getValue();
             MediaConstraints mediaConstraints;
-            if (mediaType == MediaType.SINGLE_AUDIO){
+            if (roomType == RoomType.AUDIO_ONLY){
                 mediaConstraints = createMediaConstraintsForOfferAnswer(true,false);
             }else {
                 mediaConstraints = createMediaConstraintsForOfferAnswer(true,true);
@@ -694,7 +685,7 @@ public class PeerConnectionManager implements ConnectionInterface{
             //TODO 通过socket交换sdp,这里目前并没有很好的理解，先实现功能，后期再研究并注释
             if (peerConnection.signalingState() == PeerConnection.SignalingState.HAVE_REMOTE_OFFER){
                 MediaConstraints mediaConstraints;
-                if (mediaType == MediaType.SINGLE_AUDIO){
+                if (roomType == RoomType.AUDIO_ONLY){
                     mediaConstraints = createMediaConstraintsForOfferAnswer(true,false);
                 }else {
                     mediaConstraints = createMediaConstraintsForOfferAnswer(true,true);

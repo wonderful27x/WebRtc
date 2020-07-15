@@ -7,13 +7,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import com.example.wywebrtc.R;
 import com.example.wywebrtc.bean.Message;
-import com.example.wywebrtc.webrtcinderface.MessageType;
+import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
 import com.example.wywebrtc.webrtcsource.WebRtcManager;
 import org.webrtc.EglBase;
 import org.webrtc.MediaStream;
 
+/**
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 一对一语言聊天
+ * @license  BSD-2-Clause License
+ */
 public class SingleAudioActivity extends AppCompatActivity implements WebRtcInterface, ViewCallback {
 
     private WebRtcInterface manager;
@@ -58,7 +65,7 @@ public class SingleAudioActivity extends AppCompatActivity implements WebRtcInte
     }
 
     @Override
-    public void chatRequest(int mediaType, String roomId) {
+    public void chatRequest(RoomType roomType, String roomId) {
 
     }
 
@@ -72,13 +79,13 @@ public class SingleAudioActivity extends AppCompatActivity implements WebRtcInte
     @Override
     public void socketCallback(Message message) {
         switch (message.getMessageType()){
-            case MessageType.SOCKET_OPEN:
+            case SOCKET_OPEN:
                 break;
-            case MessageType.SOCKET_CLOSE:
+            case SOCKET_CLOSE:
                 break;
-            case MessageType.SOCKET_ERROR:
+            case SOCKET_ERROR:
                 break;
-            case MessageType.ROOM_FULL:
+            case ROOM_FULL:
                 break;
             default:
                 break;

@@ -4,6 +4,13 @@ import org.webrtc.Logging;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
 
+/**
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description ?
+ * @license  BSD-2-Clause License
+ */
 public class ProxyVideoSink implements VideoSink {
     private static final String TAG = "ProxyVideoSink";
     private VideoSink target;

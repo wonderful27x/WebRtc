@@ -7,7 +7,12 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 
 /**
- * 消息实体
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 消息实体，通过他的一参构造函数能直接将一个json数据转换得到消息类型messageType，
+ * 而transForm方法能根据指定的泛型转换成具体的消息类型，这是核心方法
+ * @license BSD-2-Clause License
  */
 public class Message extends BaseMessage<String,String>{
 

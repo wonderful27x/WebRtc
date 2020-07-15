@@ -1,7 +1,11 @@
 package com.example.wywebrtc.type;
 
 /**
- * 房间类型
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 房间类型
+ * @license BSD-2-Clause License
  */
 public enum RoomType {
 

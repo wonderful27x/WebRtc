@@ -4,7 +4,11 @@ package com.example.wywebrtc.bean;
 import com.example.wywebrtc.type.DeviceType;
 
 /**
- * 用户实体
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 用户实体
+ * @license BSD-2-Clause License
  */
 public class User {
 

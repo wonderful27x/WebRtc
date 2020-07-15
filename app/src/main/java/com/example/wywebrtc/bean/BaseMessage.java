@@ -8,7 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 消息实体基类
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 消息实体基类，通过他可以方便的对json数据进行转换，他是完全面向对象的基础
+ * @license BSD-2-Clause License
  */
 public abstract class BaseMessage<T,E>{
 

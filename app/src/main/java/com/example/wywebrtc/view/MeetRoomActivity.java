@@ -24,6 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 多人聊天
+ * @license  BSD-2-Clause License
+ */
 public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterface, ViewCallback {
 
     private FrameLayout videoFrameLayout;

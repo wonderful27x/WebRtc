@@ -21,6 +21,13 @@ import org.webrtc.MediaStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 主activity
+ * @license  BSD-2-Clause License
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewCallback {
 
     private EditText roomNumber;

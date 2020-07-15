@@ -1,7 +1,11 @@
 package com.example.wywebrtc.type;
 
 /**
- * 终端类型
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 终端类型
+ * @license BSD-2-Clause License
  */
 public enum DeviceType {
 

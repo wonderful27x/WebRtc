@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.example.wywebrtc.bean.BaseMessage;
 import com.example.wywebrtc.bean.NegotiationMessage;
 import com.example.wywebrtc.bean.Room;
+import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.MessageType;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.view.MeetRoomActivity;
@@ -22,6 +23,7 @@ import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.SessionDescription;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * P2P通信中PeerConnectionManager、WebSocket和UI交互的中间纽带，做大量的信息交换，实现各层之间的解耦
@@ -89,26 +91,6 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
         socketInterface.connect(WebRtcConfig.SOCKET_URI);
     }
 
-    //socket建立成功
-    public void connectSuccess(Message message) {
-
-        connectionInterface.connectSuccess(message);
-
-        switch (roomType) {
-            case NORMAL:
-                MeetRoomActivity.startSelf(context);
-                break;
-            case VIDEO_ONLY:
-                SingleVideoActivity.startSelf(context);
-                break;
-            case AUDIO_ONLY:
-                SingleAudioActivity.startSelf(context);
-                break;
-            default:
-                break;
-        }
-    }
-
     /**==================================WebRtcInterface===========================*/
     //静音切换
     @Override
@@ -164,19 +146,35 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     /**==================================WebRtcInterface===========================*/
 
     /**====================================ConnectionInterface============================*/
+    //socket建立成功
     @Override
-    public void remoteJoinToRoom(String socketId) {
-        if(mediaType == MediaType.SINGLE_AUDIO || mediaType == MediaType.SINGLE_VIDEO){
-            if (getConnectNum() >= 1){
-                return;
-            }
+    public void connectSuccess(User user) {
+
+        connectionInterface.connectSuccess(user);
+
+        switch (roomType) {
+            case NORMAL:
+                MeetRoomActivity.startSelf(context);
+                break;
+            case VIDEO_ONLY:
+                SingleVideoActivity.startSelf(context);
+                break;
+            case AUDIO_ONLY:
+                SingleAudioActivity.startSelf(context);
+                break;
+            default:
+                break;
         }
-        connectionInterface.remoteJoinToRoom(socketId);
     }
 
     @Override
-    public void remoteOutRoom(String socketId) {
-        connectionInterface.remoteOutRoom(socketId);
+    public void remoteJoinToRoom(User user) {
+        connectionInterface.remoteJoinToRoom(user);
+    }
+
+    @Override
+    public void remoteOutRoom(User user) {
+        connectionInterface.remoteOutRoom(user);
     }
 
     @Override
@@ -196,8 +194,8 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
 
     //创建P2P连接
     @Override
-    public void createConnection(Message message) {
-        connectionInterface.createConnection(message);
+    public void createConnection(List<String> membersId) {
+        connectionInterface.createConnection(membersId);
     }
 
     //获取链接数

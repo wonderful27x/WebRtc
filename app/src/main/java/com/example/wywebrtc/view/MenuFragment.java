@@ -17,6 +17,14 @@ import com.example.wywebrtc.R;
 import com.example.wywebrtc.utils.DisplayUtil;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
 
+
+/**
+ * @author wonderful
+ * @date 2020-7-?
+ * @version 1.0
+ * @description 按钮Fragment
+ * @license  BSD-2-Clause License
+ */
 public class MenuFragment extends Fragment implements View.OnClickListener{
 
     private TextView switchMute;
