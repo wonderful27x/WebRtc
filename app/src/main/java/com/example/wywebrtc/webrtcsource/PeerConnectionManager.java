@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.RoomType;
+import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.webrtcinderface.ConnectionInterface;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
@@ -201,6 +202,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     //webSocket连接成功,获取自己的id信息
     @Override
     public void connectSuccess(User user) {
+        LogUtil.d("connectSuccess,userId: " + user.getUserId());
         this.selfId = user.getUserId();
         if (selfId == null || selfId.length() == 0){
             manager.showMessage("服务器返回了错误的userId！");
@@ -226,6 +228,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     //有人离开房间
     @Override
     public void remoteOutRoom(User user) {
+        LogUtil.d("remoteOutRoom,userId: " + user.getUserId());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -236,6 +239,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     //有人发起了SDP Offer
     @Override
     public void onReceiveOffer(String socketId, String sdp) {
+        LogUtil.d("receiveOffer,userId: " + socketId + " sdp: " + sdp);
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -251,6 +255,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     //有人回应了SDP
     @Override
     public void onReceiveAnswer(String socketId, String sdp) {
+        LogUtil.d("receiveAnswer,userId: " + socketId + " sdp: " + sdp);
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -265,6 +270,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     //有人回应了Candidate
     @Override
     public void onRemoteCandidate(String socketId, IceCandidate iceCandidate) {
+        LogUtil.d("receive IceCandidate,userId: " + socketId + " sdp: " + iceCandidate.sdp);
         Peer peer = peerConnectionMap.get(socketId);
         if (peer != null){
             peer.peerConnection.addIceCandidate(iceCandidate);
@@ -274,6 +280,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     //开始初始化数据并创建P2P连接
     @Override
     public void createConnection(List<String> membersId) {
+        LogUtil.d("createConnection,room members: " + membersId.toString());
         //去除自己的id并保存
         membersId.remove(selfId);
         socketIds.addAll(membersId);

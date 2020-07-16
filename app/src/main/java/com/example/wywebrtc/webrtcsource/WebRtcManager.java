@@ -2,10 +2,12 @@ package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 import com.example.wywebrtc.bean.NegotiationMessage;
 import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.RoomType;
+import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.view.MeetRoomActivity;
 import com.example.wywebrtc.view.SingleAudioActivity;
 import com.example.wywebrtc.view.SingleVideoActivity;
@@ -143,6 +145,7 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
         message.roomId = roomId;
         message.roomType = ((PeerConnectionManager)connectionInterface).getRoomType();
         socketInterface.joinRoom(message);
+        LogUtil.d("join room request,userId: " + message.userId + " roomId:" + message.roomId + " roomType: " + message.roomType.getType());
     }
 
     /**==================================WebRtcInterface===========================*/
@@ -249,6 +252,7 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
     /**====================================ViewCallback============================*/
     @Override
     public void socketCallback(Message message) {
+        if (viewCallback == null)return;
         viewCallback.socketCallback(message);
     }
 

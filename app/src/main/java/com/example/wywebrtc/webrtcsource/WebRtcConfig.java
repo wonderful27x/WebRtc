@@ -26,9 +26,11 @@ public class WebRtcConfig {
     //socket配置
     public static final String USER_ID = "0";                    //userId设置为"0",默认小于6位长度由服务器自动产生
     public static final int DEVICE = DeviceType.PHONE.getCode(); //设备类型为手机
-    public static final String SOCKET_URI = "ws://114.55.252.175:8080/webRtcSignalingService/webRtcSignaling";//webSocket地址
+    public static final String SOCKET_URI = "ws://192.168.0.103:8080/webRtcSignalingService/webRtcSignaling";//webSocket地址
     //摄像头配置
     public static final int CAPTURE_WIDTH = 320;  //宽
     public static final int CAPTURE_HEIGHT = 240; //高
     public static final int CAPTURE_FPS = 10;     //帧率
+    //log-TAG
+    public static final String LOG_TAG = "wonderfulWebRtc";
 }

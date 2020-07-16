@@ -8,11 +8,15 @@ import com.example.wywebrtc.bean.NegotiationMessage;
 import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.MessageType;
+import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.webrtcinderface.SocketInterface;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
+
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -49,35 +53,35 @@ public class WebSocket implements SocketInterface {
             //连接成功
             @Override
             public void onOpen(ServerHandshake handshakedata) {
+                LogUtil.d("onOpen");
                 handleMessage(MessageType.SOCKET_OPEN,null);
-                Log.d(TAG,"onOpen");
             }
             //消息推送
             @Override
             public void onMessage(String message) {
+                LogUtil.d("onMessage: " + message);
                 Message messageObject = new Message(message);
                 Event event = new Event();
-                event.objA = event;
+                event.objA = messageObject;
                 event.objB = message;
                 handleMessage(messageObject.getMessageType(),event);
-                Log.d(TAG,message);
             }
             //关闭
             @Override
             public void onClose(int code, String reason, boolean remote) {
+                LogUtil.d("onClose-reason: " + reason);
                 Event event = new Event();
                 event.code = code;
                 event.message = reason;
                 handleMessage(MessageType.SOCKET_CLOSE,event);
-                Log.d(TAG,"onClose");
             }
             //连接失败
             @Override
             public void onError(Exception ex) {
+                LogUtil.e("error: " + ex.getMessage());
                 Event event = new Event();
                 event.message = ex.getMessage();
                 handleMessage(MessageType.SOCKET_ERROR,event);
-                Log.e(TAG,ex.getMessage());
             }
         };
         //TODO 使用加密连接
@@ -91,6 +95,7 @@ public class WebSocket implements SocketInterface {
     //服务器会给处理关闭者的其他人发送消息，告诉大家有人离开了房间
     @Override
     public void close() {
+        LogUtil.d("close");
         if (webSocketClient != null){
             webSocketClient.close();
             webSocketClient = null;
@@ -234,15 +239,22 @@ public class WebSocket implements SocketInterface {
     public void joinRoom(NegotiationMessage negotiationMessage){
         BaseMessage<NegotiationMessage,Object> baseMessage = new BaseMessage<NegotiationMessage, Object>() {};
         baseMessage.setMessage(negotiationMessage);
-        webSocketClient.send(baseMessage.toJson());
+        baseMessage.setMessageType(MessageType.JOIN);
+        String jsonData = baseMessage.toJson();
+        LogUtil.d("joinRoom-json: " + jsonData);
+        webSocketClient.send(jsonData);
     }
 
     //向房间的其他成员发送自己的SDP信息
     @Override
     public void sendOffer(String socketId, SessionDescription localDescription) {
+        LogUtil.d("sendOffer,userId: " + socketId + " sdp: " + localDescription.description);
         BaseMessage<NegotiationMessage,Object> baseMessage = new BaseMessage<NegotiationMessage, Object>() {};
-        baseMessage.getMessage().userId = socketId;
-        baseMessage.getMessage().sdp = localDescription.description;
+        NegotiationMessage message = new NegotiationMessage();
+        message.userId = socketId;
+        message.sdp = localDescription.description;
+        baseMessage.setMessage(message);
+        baseMessage.setMessageType(MessageType.OFFER);
         String jsonData = baseMessage.toJson();
         webSocketClient.send(jsonData);
     }
@@ -250,9 +262,13 @@ public class WebSocket implements SocketInterface {
     //发送应答,告诉对方自己的SDP
     @Override
     public void sendAnswer(String socketId, SessionDescription localDescription) {
+        LogUtil.d("sendAnswer,userId: " + socketId + " sdp: " + localDescription.description);
         BaseMessage<NegotiationMessage,Object> baseMessage = new BaseMessage<NegotiationMessage, Object>() {};
-        baseMessage.getMessage().userId = socketId;
-        baseMessage.getMessage().sdp = localDescription.description;
+        NegotiationMessage message = new NegotiationMessage();
+        message.userId = socketId;
+        message.sdp = localDescription.description;
+        baseMessage.setMessage(message);
+        baseMessage.setMessageType(MessageType.ANSWER);
         String jsonData = baseMessage.toJson();
         webSocketClient.send(jsonData);
     }
@@ -260,11 +276,15 @@ public class WebSocket implements SocketInterface {
     //向房间的其他成员发送自己的iceCandidate信息
     @Override
     public void sendIceCandidate(String socketId, IceCandidate iceCandidate) {
+        LogUtil.d("sendIceCandidate,userId: " + socketId + " sdp: " + iceCandidate.sdp);
         BaseMessage<NegotiationMessage,Object> baseMessage = new BaseMessage<NegotiationMessage, Object>() {};
-        baseMessage.getMessage().userId = socketId;
-        baseMessage.getMessage().sdpMid = iceCandidate.sdpMid;
-        baseMessage.getMessage().sdpMLineIndex = iceCandidate.sdpMLineIndex;
-        baseMessage.getMessage().sdp = iceCandidate.sdp;
+        NegotiationMessage message = new NegotiationMessage();
+        message.userId = socketId;
+        message.sdpMid = iceCandidate.sdpMid;
+        message.sdpMLineIndex = iceCandidate.sdpMLineIndex;
+        message.sdp = iceCandidate.sdp;
+        baseMessage.setMessage(message);
+        baseMessage.setMessageType(MessageType.CANDIDATE);
         String jsonData = baseMessage.toJson();
         webSocketClient.send(jsonData);
     }

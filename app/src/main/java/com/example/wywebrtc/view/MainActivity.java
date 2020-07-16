@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.wywebrtc.R;
 import com.example.wywebrtc.bean.Message;
 import com.example.wywebrtc.type.RoomType;
+import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
 import com.example.wywebrtc.webrtcsource.WebRtcManager;
@@ -35,13 +36,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button p2pVideo;
     private Button p2pAudio;
     private Button live;
+    private int defaultCheck = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        permissionCheck(RoomType.DEFAULT);
+        permissionCheck(defaultCheck);
     }
 
     private void init(){
@@ -57,12 +59,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         live.setOnClickListener(this);
     }
 
-    private void permissionCheck(RoomType roomType){
+    private void permissionCheck(int code){
         List<String> permissions = permissionCheck();
         if (!permissions.isEmpty()){
-            permissionRequest(permissions,roomType.getCode());
-        }else if (roomType != RoomType.DEFAULT){
-            sendRequest(roomType.getCode());
+            permissionRequest(permissions,code);
+        }else if (code != defaultCheck){
+            sendRequest(code);
         }
     }
 
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == RoomType.DEFAULT.getCode()){
+        if (requestCode == defaultCheck){
             if (grantResults.length >0){
                 for (int result:grantResults){
                     if (result != PackageManager.PERMISSION_GRANTED){
@@ -124,16 +126,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.addRoom:
-                permissionCheck(RoomType.NORMAL);
+                permissionCheck(RoomType.NORMAL.getCode());
                 break;
             case R.id.p2pVideo:
-                permissionCheck(RoomType.VIDEO_ONLY);
+                permissionCheck(RoomType.VIDEO_ONLY.getCode());
                 break;
             case R.id.p2pAudio:
-                permissionCheck(RoomType.AUDIO_ONLY);
+                permissionCheck(RoomType.AUDIO_ONLY.getCode());
                 break;
             case R.id.live:
-                permissionCheck(RoomType.LIVE);
+                permissionCheck(RoomType.LIVE.getCode());
                 break;
             default:
                 break;
@@ -164,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //发起请求，必须指定房间号和房间类型，如果房间不存在服务器会主动创建一个房间
     //注意这个方法仅仅是与服务器建立连接而已，成功后再做后续的操作，这里传递房间号和房间类型是为了保存信息
     private void sendRequest(int roomTypeCode){
+        LogUtil.d("send connect request");
         WebRtcInterface webRtcInterface = WebRtcManager.getInstance(this,null);
         webRtcInterface.chatRequest(RoomType.getRooType(roomTypeCode),roomNumber.getText().toString());
     }

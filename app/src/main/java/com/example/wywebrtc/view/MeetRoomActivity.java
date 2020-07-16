@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.example.wywebrtc.R;
 import com.example.wywebrtc.bean.Message;
 import com.example.wywebrtc.type.RoomType;
+import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.utils.PositionUtil;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
@@ -44,6 +45,7 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_room_layout);
+        LogUtil.d("MeetRoomActivity start");
         placeFragment();
         videoFrameLayout = findViewById(R.id.videoFrameLayout);
         eglBase = EglBase.create();
@@ -76,6 +78,7 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
     //webSocket的关闭将会得到远端的响应
     @Override
     public void hangUp() {
+        LogUtil.d("hangUp");
         exitRoom();
         finish();
     }
@@ -123,6 +126,7 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
      */
     @Override
     public void setLocalStream(MediaStream localStream, String selfId) {
+        LogUtil.d("setLocalStream");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -138,6 +142,7 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
      */
     @Override
     public void addRemoteStream(MediaStream remoteStream, String socketId) {
+        LogUtil.d("addRemoteStream");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -149,6 +154,7 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
     //当远端有人退出房间是这个方法会被回调，则将窗口关闭
     @Override
     public void closeWindow(String socketId) {
+        LogUtil.d("closeWindow");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
