@@ -217,6 +217,7 @@ public class WebSocket implements SocketInterface {
     //他们之间的数据发送是异步的，即不需要等到A收到B的数据才给B响应，并且网络协商数据会交换多次
     //而媒体协商数据Offer交换一次就够了
     private void candidateSwitch(Event event){
+        LogUtil.d("candidate message: " + event.objB);
         Message message = (Message) event.objA;
         BaseMessage<NegotiationMessage,Object> baseMessage = message.transForm(new BaseMessage<NegotiationMessage, Object>() {});
         NegotiationMessage negotiationMessage = baseMessage.getMessage();
@@ -276,7 +277,7 @@ public class WebSocket implements SocketInterface {
     //向房间的其他成员发送自己的iceCandidate信息
     @Override
     public void sendIceCandidate(String socketId, IceCandidate iceCandidate) {
-        LogUtil.d("sendIceCandidate,userId: " + socketId + " sdp: " + iceCandidate.sdp);
+        LogUtil.d("sendIceCandidate,userId: " + socketId + " sdpMid: " + iceCandidate.sdpMid + " sdpMLineIndex: " + iceCandidate.sdpMLineIndex + " sdp: " + iceCandidate.sdp);
         BaseMessage<NegotiationMessage,Object> baseMessage = new BaseMessage<NegotiationMessage, Object>() {};
         NegotiationMessage message = new NegotiationMessage();
         message.userId = socketId;
@@ -286,6 +287,7 @@ public class WebSocket implements SocketInterface {
         baseMessage.setMessage(message);
         baseMessage.setMessageType(MessageType.CANDIDATE);
         String jsonData = baseMessage.toJson();
+        LogUtil.d("sendIceCandidate,json: " + jsonData);
         webSocketClient.send(jsonData);
     }
     /**============================通过webSocket发送消息========================*/

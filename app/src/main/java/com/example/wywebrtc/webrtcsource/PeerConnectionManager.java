@@ -268,9 +268,11 @@ public class PeerConnectionManager implements ConnectionInterface{
         });
     }
     //有人回应了Candidate
+    //TODO 特别注意！！！，在信令交换过程中务必保证IceCandidate中sdpMid和sdp是非null的，
+    //TODO 否则在调用peerConnection.addIceCandidate(iceCandidate)时会发生空指针异常，这个错误非常难以排查
     @Override
     public void onRemoteCandidate(String socketId, IceCandidate iceCandidate) {
-        LogUtil.d("receive IceCandidate,userId: " + socketId + " sdp: " + iceCandidate.sdp);
+        LogUtil.d("receive IceCandidate,userId: " + socketId + " sdpMid: " + iceCandidate.sdpMid + " sdpMLineIndex: " + iceCandidate.sdpMLineIndex + " sdp: " + iceCandidate.sdp);
         Peer peer = peerConnectionMap.get(socketId);
         if (peer != null){
             peer.peerConnection.addIceCandidate(iceCandidate);

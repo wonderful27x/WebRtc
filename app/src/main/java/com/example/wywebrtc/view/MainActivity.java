@@ -135,6 +135,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 permissionCheck(RoomType.AUDIO_ONLY.getCode());
                 break;
             case R.id.live:
+                if (true){
+                    Toast.makeText(this,"敬请期待",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 permissionCheck(RoomType.LIVE.getCode());
                 break;
             default:
