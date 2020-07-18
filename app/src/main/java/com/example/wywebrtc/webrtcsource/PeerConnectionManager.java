@@ -2,6 +2,8 @@ package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.os.Handler;
+
 import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.utils.LogUtil;
@@ -623,6 +625,9 @@ public class PeerConnectionManager implements ConnectionInterface{
          */
         @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
+            //TODO 服务端使用getAsyncRemote同步方法频繁发送消息有时会发生异常（The remote endpoint was in state [TEXT_FULL_WRITING] which is an invalid state for called method）
+            //TODO 后来使用getBasicRemote异步方法来解决，但是网络说高并发下仍然可能发生异常，
+            //TODO 所以这里在后期将考虑循环队列，先将数据存储下来，开一个任务循环从队列取数据发送
             manager.sendIceCandidate(socketId,iceCandidate);
         }
 
