@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.example.wywebrtc.R;
+import com.example.wywebrtc.bean.BaseMessage;
 import com.example.wywebrtc.bean.Message;
+import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.utils.PositionUtil;
@@ -107,16 +109,22 @@ public class MeetRoomActivity extends AppCompatActivity implements WebRtcInterfa
             case SOCKET_ERROR:
                 break;
             case ROOM_FULL:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MeetRoomActivity.this,message.getMessage(),Toast.LENGTH_LONG).show();
-                    }
-                });
+                showFullMessage(message);
                 break;
             default:
                 break;
         }
+    }
+
+    private void showFullMessage(Message message){
+        BaseMessage<Room,Object> baseMessage = message.transForm(new BaseMessage<Room, Object>() {});
+        String msg = "房间已满，房间号： " + baseMessage.getMessage().getRoomId() + " maxSize: " + baseMessage.getMessage().maxSize() + " currentSize: " + baseMessage.getMessage().currentSize();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MeetRoomActivity.this,msg,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     /**

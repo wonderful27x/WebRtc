@@ -12,11 +12,8 @@ import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.webrtcinderface.SocketInterface;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
-
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;

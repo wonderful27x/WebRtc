@@ -23,7 +23,7 @@ public class WebRtcConfig {
     public static final String TURN_URI = "turn:114.55.252.175:3479?transport=udp";
     public static final String TURN_USER_NAME = "wonderful";
     public static final String TURN_PASSWORD = "wonderful@123";
-    //socket配置
+    //socket配置192.168.0.103:8080
     public static final String USER_ID = "0";                    //userId设置为"0",默认小于6位长度由服务器自动产生
     public static final int DEVICE = DeviceType.PHONE.getCode(); //设备类型为手机
     public static final String SOCKET_URI = "ws://xxx:xxx/webRtcSignalingService/webRtcSignaling";//webSocket地址

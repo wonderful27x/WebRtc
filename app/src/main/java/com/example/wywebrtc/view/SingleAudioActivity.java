@@ -5,8 +5,12 @@ import androidx.fragment.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import com.example.wywebrtc.R;
+import com.example.wywebrtc.bean.BaseMessage;
 import com.example.wywebrtc.bean.Message;
+import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
@@ -86,10 +90,22 @@ public class SingleAudioActivity extends AppCompatActivity implements WebRtcInte
             case SOCKET_ERROR:
                 break;
             case ROOM_FULL:
+                showFullMessage(message);
                 break;
             default:
                 break;
         }
+    }
+
+    private void showFullMessage(Message message){
+        BaseMessage<Room,Object> baseMessage = message.transForm(new BaseMessage<Room, Object>() {});
+        String msg = "房间已满，房间号： " + baseMessage.getMessage().getRoomId() + " maxSize: " + baseMessage.getMessage().maxSize() + " currentSize: " + baseMessage.getMessage().currentSize();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(SingleAudioActivity.this,msg,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

@@ -26,7 +26,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".view.SingleAudioActivity" />
-        <activity android:name=".view.SingleVideoActivity" />
+        <activity android:name=".view.SingleChatActivity" />
         <activity android:name=".view.MeetRoomActivity" />
         <activity android:name=".view.MainActivity">
             <intent-filter>

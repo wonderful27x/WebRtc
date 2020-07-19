@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.example.wywebrtc.R;
+import com.example.wywebrtc.bean.BaseMessage;
 import com.example.wywebrtc.bean.Message;
+import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
@@ -126,13 +128,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.addRoom:
-                permissionCheck(RoomType.NORMAL.getCode());
+                permissionCheck(RoomType.MEETING.getCode());
                 break;
             case R.id.p2pVideo:
-                permissionCheck(RoomType.VIDEO_ONLY.getCode());
+                permissionCheck(RoomType.SINGLE.getCode());
                 break;
             case R.id.p2pAudio:
-                permissionCheck(RoomType.AUDIO_ONLY.getCode());
+                permissionCheck(RoomType.SINGLE_AUDIO.getCode());
                 break;
             case R.id.live:
                 if (true){
@@ -149,7 +151,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void socketCallback(Message message) {
+        switch (message.getMessageType()){
+            case SOCKET_OPEN:
+                break;
+            case SOCKET_CLOSE:
+                break;
+            case SOCKET_ERROR:
+                break;
+            case ROOM_FULL:
+                showFullMessage(message);
+                break;
+            default:
+                break;
+        }
+    }
 
+    private void showFullMessage(Message message){
+        BaseMessage<Room,Object> baseMessage = message.transForm(new BaseMessage<Room, Object>() {});
+        String msg = "房间已满，房间号： " + baseMessage.getMessage().getRoomId() + " maxSize: " + baseMessage.getMessage().maxSize() + " currentSize: " + baseMessage.getMessage().currentSize();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

@@ -2,8 +2,6 @@ package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.os.Handler;
-
 import com.example.wywebrtc.bean.User;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.utils.LogUtil;
@@ -277,6 +275,7 @@ public class PeerConnectionManager implements ConnectionInterface{
         LogUtil.d("receive IceCandidate,userId: " + socketId + " sdpMid: " + iceCandidate.sdpMid + " sdpMLineIndex: " + iceCandidate.sdpMLineIndex + " sdp: " + iceCandidate.sdp);
         Peer peer = peerConnectionMap.get(socketId);
         if (peer != null){
+            LogUtil.d("addIceCandidate");
             peer.peerConnection.addIceCandidate(iceCandidate);
         }
     }
@@ -417,7 +416,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     private PeerConnectionFactory createPeerConnectionFactory(){
         VideoEncoderFactory videoEncoderFactory = null;
         VideoDecoderFactory videoDecoderFactory = null;
-        if (roomType != RoomType.AUDIO_ONLY){
+        if (roomType != RoomType.SINGLE_AUDIO){
             //创建视频编码器工厂并开启v8和h264编码，webrtc会自动选择最优的，当然也可以只开启其中一个
             videoEncoderFactory = new DefaultVideoEncoderFactory(manager.getEglBase().getEglBaseContext(),true,true);
             //创建视频解密器工厂
@@ -446,7 +445,7 @@ public class PeerConnectionManager implements ConnectionInterface{
         localStream.addTrack(audioTrack);                                                   //将音轨设置到localStream里
 
         //视频
-        if (roomType == RoomType.AUDIO_ONLY)return;
+        if (roomType == RoomType.SINGLE_AUDIO)return;
         videoCapturer = createVideoCapturer();                                              //创建videoCapturer
         videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());//创建视频源
 
@@ -489,7 +488,7 @@ public class PeerConnectionManager implements ConnectionInterface{
             role = Role.caller;
             Peer peer = entry.getValue();
             MediaConstraints mediaConstraints;
-            if (roomType == RoomType.AUDIO_ONLY){
+            if (roomType == RoomType.SINGLE_AUDIO){
                 mediaConstraints = createMediaConstraintsForOfferAnswer(true,false);
             }else {
                 mediaConstraints = createMediaConstraintsForOfferAnswer(true,true);
@@ -639,12 +638,13 @@ public class PeerConnectionManager implements ConnectionInterface{
         //p2p连接建立成功后回调，mediaStream封装了音视频流，这时就可以回到ui层进行对方音视频的播放和显示了
         @Override
         public void onAddStream(MediaStream mediaStream) {
+            LogUtil.d("onAddStream");
             manager.addRemoteStream(mediaStream,socketId);
         }
 
         @Override
         public void onRemoveStream(MediaStream mediaStream) {
-            //TODO
+            LogUtil.d("onRemoveStream");
             manager.closeWindow(socketId);
         }
 
@@ -693,7 +693,7 @@ public class PeerConnectionManager implements ConnectionInterface{
             //TODO 通过socket交换sdp,这里目前并没有很好的理解，先实现功能，后期再研究并注释
             if (peerConnection.signalingState() == PeerConnection.SignalingState.HAVE_REMOTE_OFFER){
                 MediaConstraints mediaConstraints;
-                if (roomType == RoomType.AUDIO_ONLY){
+                if (roomType == RoomType.SINGLE_AUDIO){
                     mediaConstraints = createMediaConstraintsForOfferAnswer(true,false);
                 }else {
                     mediaConstraints = createMediaConstraintsForOfferAnswer(true,true);

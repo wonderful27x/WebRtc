@@ -69,7 +69,7 @@ public class MenuFragment extends Fragment implements View.OnClickListener{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         this.activity = getActivity();
-        if (activity instanceof SingleVideoActivity || activity instanceof SingleAudioActivity){
+        if (activity instanceof SingleChatActivity || activity instanceof SingleAudioActivity){
             rootView.setBackground(null);
         }
     }

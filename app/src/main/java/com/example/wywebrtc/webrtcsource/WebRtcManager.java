@@ -2,7 +2,6 @@ package com.example.wywebrtc.webrtcsource;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 import com.example.wywebrtc.bean.NegotiationMessage;
 import com.example.wywebrtc.bean.User;
@@ -10,7 +9,7 @@ import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.utils.LogUtil;
 import com.example.wywebrtc.view.MeetRoomActivity;
 import com.example.wywebrtc.view.SingleAudioActivity;
-import com.example.wywebrtc.view.SingleVideoActivity;
+import com.example.wywebrtc.view.SingleChatActivity;
 import com.example.wywebrtc.bean.Message;
 import com.example.wywebrtc.webrtcinderface.ConnectionInterface;
 import com.example.wywebrtc.webrtcinderface.SocketInterface;
@@ -160,13 +159,13 @@ public class WebRtcManager implements WebRtcInterface,ConnectionInterface,Socket
 
         //根据不同的房间类型启动不同的Activity
         switch (roomType) {
-            case NORMAL:
+            case MEETING:
                 MeetRoomActivity.startSelf(context);
                 break;
-            case VIDEO_ONLY:
-                SingleVideoActivity.startSelf(context);
+            case SINGLE:
+                SingleChatActivity.startSelf(context);
                 break;
-            case AUDIO_ONLY:
+            case SINGLE_AUDIO:
                 SingleAudioActivity.startSelf(context);
                 break;
             default:

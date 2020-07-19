@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.Toast;
 import com.example.wywebrtc.R;
+import com.example.wywebrtc.bean.BaseMessage;
 import com.example.wywebrtc.bean.Message;
+import com.example.wywebrtc.bean.Room;
 import com.example.wywebrtc.type.RoomType;
 import com.example.wywebrtc.webrtcinderface.ViewCallback;
 import com.example.wywebrtc.webrtcinderface.WebRtcInterface;
@@ -26,7 +28,7 @@ import org.webrtc.SurfaceViewRenderer;
  * @description 一对一语言聊天
  * @license  BSD-2-Clause License
  */
-public class SingleVideoActivity extends AppCompatActivity implements WebRtcInterface, ViewCallback {
+public class SingleChatActivity extends AppCompatActivity implements WebRtcInterface, ViewCallback {
 
     private static final String TAG = "SingleVideoActivity";
 
@@ -137,7 +139,7 @@ public class SingleVideoActivity extends AppCompatActivity implements WebRtcInte
     }
 
     public static void startSelf(Context context){
-        Intent intent = new Intent(context,SingleVideoActivity.class);
+        Intent intent = new Intent(context, SingleChatActivity.class);
         context.startActivity(intent);
     }
 
@@ -222,16 +224,22 @@ public class SingleVideoActivity extends AppCompatActivity implements WebRtcInte
             case SOCKET_ERROR:
                 break;
             case ROOM_FULL:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(SingleVideoActivity.this,message.getMessage(),Toast.LENGTH_LONG).show();
-                    }
-                });
+                showFullMessage(message);
                 break;
             default:
                 break;
         }
+    }
+
+    private void showFullMessage(Message message){
+        BaseMessage<Room,Object> baseMessage = message.transForm(new BaseMessage<Room, Object>() {});
+        String msg = "房间已满，房间号： " + baseMessage.getMessage().getRoomId() + " maxSize: " + baseMessage.getMessage().maxSize() + " currentSize: " + baseMessage.getMessage().currentSize();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(SingleChatActivity.this,msg,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
