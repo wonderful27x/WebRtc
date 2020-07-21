@@ -389,6 +389,7 @@ public class PeerConnectionManager implements ConnectionInterface{
     private void closePeerConnection(String socketId){
         Peer peer = peerConnectionMap.get(socketId);
         if (peer != null){
+            peer.quitQueue();
             peer.peerConnection.close();
             peerConnectionMap.remove(socketId);
             socketIds.remove(socketId);
@@ -575,8 +576,9 @@ public class PeerConnectionManager implements ConnectionInterface{
 
     //P2P连接封装类
     private class Peer implements PeerConnection.Observer, SdpObserver {
-        private PeerConnection peerConnection;//跟远端用户的一个连接
-        private String socketId;              //远端用户的id
+        private PeerConnection peerConnection;               //跟远端用户的一个连接
+        private String socketId;                             //远端用户的id
+        private WonderfulDelayQueue<IceCandidate> delayQueue;//延迟队列
 
         public Peer(String socketId){
             this.socketId = socketId;
@@ -584,6 +586,9 @@ public class PeerConnectionManager implements ConnectionInterface{
             PeerConnection.RTCConfiguration configuration = new PeerConnection.RTCConfiguration(iceServers);
             //通过工厂创建连接,并设置回调
             peerConnection = peerConnectionFactory.createPeerConnection(configuration,this);
+            if (WebRtcConfig.enableDelayQueue){
+                delayQueue = new WonderfulDelayQueue<>(50);
+            }
         }
 
         /**==================================PeerConnection.Observer==================================*/
@@ -627,7 +632,15 @@ public class PeerConnectionManager implements ConnectionInterface{
             //TODO 服务端使用getAsyncRemote同步方法频繁发送消息有时会发生异常（The remote endpoint was in state [TEXT_FULL_WRITING] which is an invalid state for called method）
             //TODO 后来使用getBasicRemote异步方法来解决，但是网络说高并发下仍然可能发生异常，
             //TODO 所以这里在后期将考虑循环队列，先将数据存储下来，开一个任务循环从队列取数据发送
-            manager.sendIceCandidate(socketId,iceCandidate);
+
+            //如果开启了延迟队列将数据加入到延时队列中
+            if (WebRtcConfig.enableDelayQueue){
+                delayQueue.push(iceCandidate);
+            }
+            //否则直接发送
+            else {
+                manager.sendIceCandidate(socketId,iceCandidate);
+            }
         }
 
         @Override
@@ -716,6 +729,14 @@ public class PeerConnectionManager implements ConnectionInterface{
                     manager.sendAnswer(socketId,peerConnection.getLocalDescription());
                 }
             }
+
+            //媒体协商完成，开始进行网络协商
+            if ((role == Role.caller && peerConnection.getRemoteDescription() != null)
+                    || (role == Role.receiver && peerConnection.getLocalDescription() != null)){
+                //TODO 应当注意的是在没有使用延迟队列的时候媒体协商和网络协商是异步的，
+                //TODO 在使用了延迟队列后媒体协商交换完成再进行网络协商，但是这么设计并不是唯一的
+                sendCandidateFromQueue(socketId);
+            }
         }
 
         @Override
@@ -726,6 +747,26 @@ public class PeerConnectionManager implements ConnectionInterface{
         @Override
         public void onSetFailure(String s) {
 
+        }
+
+        //从队列中发送candidate
+        private void sendCandidateFromQueue(String socketId){
+            if (WebRtcConfig.enableDelayQueue){
+                if (delayQueue.isRunning())return;
+                delayQueue.run(new WonderfulDelayQueue.PopInterface<IceCandidate>() {
+                    @Override
+                    public void pop(DelayQueueElement<IceCandidate> delayQueueElement) {
+                        manager.sendIceCandidate(socketId,delayQueueElement.getData());
+                    }
+                });
+            }
+        }
+
+        //终止队列
+        public void quitQueue(){
+            if (delayQueue != null){
+                delayQueue.quit();
+            }
         }
     }
 

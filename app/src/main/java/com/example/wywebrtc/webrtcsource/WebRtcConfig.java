@@ -31,6 +31,8 @@ public class WebRtcConfig {
     public static final int CAPTURE_WIDTH = 320;  //宽
     public static final int CAPTURE_HEIGHT = 240; //高
     public static final int CAPTURE_FPS = 10;     //帧率
+    //是否开启Candidate延迟队列
+    public static final boolean enableDelayQueue = true;
     //log-TAG
     public static final String LOG_TAG = "wonderfulWebRtc";
 }
